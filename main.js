@@ -1,12 +1,12 @@
 /**
  * Generate a Psykick Component from a simplified syntax
- * Usage: node main.js inputfile
+ * Usage: node main.js inputfile [3d]
  */
 
 'use strict';
 
-if (process.argv.length !== 3) {
-    console.log('Usage: node main.js inputfile');
+if (process.argv.length < 3) {
+    console.log('Usage: node main.js inputfile [3d]');
     process.exit(1);
 }
 
@@ -15,7 +15,8 @@ var PEG = require('pegjs'),
     fs = require('fs'),
     loadFile = function(path) {
         return fs.readFileSync(path).toString();
-    };
+    },
+    use3D = process.argv[3] === '3d';
 
 
 // Generate a parser
@@ -25,7 +26,7 @@ var parser = PEG.buildParser(loadFile('./grammar.pegjs'));
 var source = loadFile(process.argv[2]);
 
 // Create a code generator
-var generator = new Generator(parser.parse(source));
+var generator = new Generator(parser.parse(source), use3D);
 
 // Generate code for each of the components
 var components = generator.generateCode();

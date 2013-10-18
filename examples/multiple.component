@@ -1,0 +1,19 @@
+/**
+ * It's possible to design multiple components in one file
+ * Each component will go into it's own separate file
+ */
+
+FirstExampleComponent {
+    // The one will be saved to first-example.js
+    first => "The first of multiple components"
+}
+
+SecondExampleComponent {
+    // This one will be saved to second-example.js
+    second => "Pretty cool, right?"
+}
+
+ThirdExampleComponent {
+    // This one will be saved to --you guessed it-- third-example.js
+    third => "I could go on but you get the idea"
+}

@@ -1,5 +1,7 @@
 {
   "name": "psykick-component-generator",
+  "version": "0.0.1",
+  "author": "Mike Cluck (mcluck90@gmail.com)",
   "description": "Generates components for the Psykick engine",
   "dependencies": {
     "pegjs": "git://github.com/dmajda/pegjs#5312e124cde69d328d6de86809fd68d1a6b1399e"

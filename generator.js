@@ -1,28 +1,42 @@
 'use strict';
 
-var HEADER = "var Component = require('psykick').Component,\n" +
-             "    Helper = require('psykick').Helper;\n\n";
+var HEADER_2D = "var Component = require('psykick').Component,\n" +
+                "    Helper = require('psykick').Helper;\n\n",
+    HEADER_3D = "var Component = require('psykick3d').Component,\n" +
+                "    Helper = require('psykick3d').Helper;\n\n";
 
 /**
  * Generates the Psykick Component code from an AST
  * @param {Object} ast  Abstract syntax tree
  * @constructor
  */
-var Generator = function(ast) {
+var Generator = function(ast, use3D) {
     this.ast = ast;
+    this.use3D = use3D;
 };
 
+/**
+ * Generates the Javascript code
+ * @param component
+ * @returns {string}
+ */
 function createCode(component) {
     var name = component.name,
         properties = component.body.properties;
 
-    var code = HEADER;
+    var code = (this.use3D) ? HEADER_3D : HEADER_2D;
     code += createConstructor(name, properties);
     code += createInheritanceLine(name);
     code += createExports(name);
     return code;
 }
 
+/**
+ * Creates the constructor section
+ * @param name  - Name of the component
+ * @param properties
+ * @returns {string}
+ */
 function createConstructor(name, properties) {
     var code = "var " + name + " = function(options) {\n";
     code += createDefaults(properties);
@@ -31,6 +45,11 @@ function createConstructor(name, properties) {
     return code;
 }
 
+/**
+ * Creates the "defaults" section
+ * @param properties
+ * @returns {string}
+ */
 function createDefaults(properties) {
     var code = "\toptions = Helper.defaults(options, {\n";
 
@@ -44,6 +63,12 @@ function createDefaults(properties) {
     return code;
 }
 
+/**
+ * Parses out individual properties
+ * @param property
+ * @param depth
+ * @returns {*}
+ */
 function parseProperty(property, depth) {
     switch(property.type) {
         case 'ObjectLiteral':
@@ -76,6 +101,12 @@ function parseProperty(property, depth) {
     }
 }
 
+/**
+ * Produces code for an object
+ * @param objTree
+ * @param depth
+ * @returns {string}
+ */
 function parseObject(objTree, depth) {
     var tabs = new Array(depth + 1).join('\t'),
         code = '{\n';
@@ -97,6 +128,12 @@ function parseObject(objTree, depth) {
     return code;
 }
 
+/**
+ * Produces code for an array
+ * @param arrTree
+ * @param depth
+ * @returns {string}
+ */
 function parseArray(arrTree, depth) {
     var tabs = new Array(depth + 1).join('\t'),
         code = '[\n';
@@ -116,6 +153,11 @@ function parseArray(arrTree, depth) {
     return code;
 }
 
+/**
+ * Creates the section where class properties are set
+ * @param properties
+ * @returns {string}
+ */
 function createProperties(properties) {
     var tab = "\t",
         code = "";
@@ -127,36 +169,36 @@ function createProperties(properties) {
     return code;
 }
 
+/**
+ * Sticks in the little line to make it inherit from Component
+ * @param name
+ * @returns {string}
+ */
 function createInheritanceLine(name) {
     return "Helper.inherit(" + name + ", Component);\n\n";
 }
 
+/**
+ * Tack on the module.exports line
+ * @param name
+ * @returns {string}
+ */
 function createExports(name) {
     return "module.exports = " + name + ";";
 }
 
+/**
+ * Generates code for a set of component definitions
+ * @returns {Array}
+ */
 Generator.prototype.generateCode = function() {
     var components = [];
     for (var i = 0, len = this.ast.length; i < len; i++) {
         var component = this.ast[i];
         components.push({
             name: component.name,
-            code: createCode(component)
+            code: createCode.call(this, component)
         });
-    }
-
-    return components;
-};
-
-Generator.prototype.parse = function(ast) {
-    if (ast !== undefined) {
-        this.ast = ast;
-    }
-
-    var components = [];
-
-    for (var i = 0, len = this.ast.length; i < len; i++) {
-        components.push(generateComponent(this.ast[i]));
     }
 
     return components;
