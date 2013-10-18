@@ -1,0 +1,28 @@
+// The generator will ignore any single line comments
+/*
+    Multi
+    line
+    comments
+    too
+*/
+
+BasicExampleComponent {
+    nullProp => null,
+    undefProp => undefined,
+    num => 0,
+    hex => 0xF00,
+    str => "For now, only double-quoted strings work",
+    obj => {
+        prop1 => 1,
+        prop2 => {
+            nestedProperty => "This can go on (theoretically) forever"
+        }
+    },
+    arr => [
+        1,2,3,
+        "Yup","arrays","work","too",
+        {
+            even => "with objects in them!"
+        }
+    ]
+}
